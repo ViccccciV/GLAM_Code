@@ -76,7 +76,7 @@ Single-object prompts keep only the largest connected component per frame
 `--multi_object` so every sizable component is kept — without it, one of the
 two cubes would be dropped from every mask.
 
-This step needs its own environment with SAM 3 support and a checkpoint following the
+This step needs its own environment with pip install -U ultralytics (which provides the SAM 3 predictors) and a SAM 3 checkpoint from the
 [SAM 3 repository](https://github.com/facebookresearch/sam3), then pass the checkpoint via `--model_path` if it is not in the working directory. Masks are written next to the frames as `{view}_frames_mask/` PNGs. If you train GLAM with `--raw_image` instead, this
 step can be skipped entirely.
 
