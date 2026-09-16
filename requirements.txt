@@ -1,0 +1,8 @@
+# Core dependencies (versions mirror the environment used for the paper experiments)
+torch==2.1.0
+torchvision==0.16.0
+numpy==1.26.4
+scipy==1.15.2
+pillow>=10.0
+tqdm>=4.60
+wandb>=0.16

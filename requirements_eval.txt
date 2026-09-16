@@ -1,0 +1,15 @@
+torch==2.1.0
+torchvision==0.16.0
+numpy==1.26.4
+scipy==1.15.2
+mujoco==3.2.7
+mink==0.0.13
+qpsolvers[osqp]
+imageio
+imageio-ffmpeg
+matplotlib
+opencv-python
+pillow
+glfw
+PyOpenGL
+tqdm

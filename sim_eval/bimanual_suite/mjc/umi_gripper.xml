@@ -1,0 +1,180 @@
+<mujoco model="umi_gripper">
+  <compiler angle="radian" meshdir="assets" texturedir="assets" />
+
+  <option integrator="implicitfast" impratio="10" cone="elliptic" noslip_iterations="2">
+    <flag multiccd="enable" />
+  </option>
+
+  <asset>
+    <!-- meshes -->
+    <mesh name="umi_base_link" file="assets/umi_gripper/meshes/new_base.stl" />
+    <mesh name="umi_left_finger_holder" file="assets/umi_gripper/meshes/left_finger_holder.stl" />
+    <mesh name="umi_left_finger" file="assets/umi_gripper/meshes/left_finger.stl" />
+    <mesh name="umi_right_finger_holder" file="assets/umi_gripper/meshes/right_finger_holder.stl" />
+    <mesh name="umi_right_finger" file="assets/umi_gripper/meshes/right_finger.stl" />
+    <!-- <mesh name="umi_gopro" file="assets/umi_gripper/meshes/gopro.stl" /> -->
+    <!-- textures & materials -->
+    <texture name="umi_right_aruco_sticker" type="2d" file="assets/umi_gripper/meshes/right_aruco_sticker.png" />
+    <texture name="umi_left_aruco_sticker" type="2d" file="assets/umi_gripper/meshes/left_aruco_sticker.png" />
+    <material name="umi_Right_Aruco_Base_Sticker" texture="umi_right_aruco_sticker" />
+    <material name="umi_Left_Aruco_Base_Sticker" texture="umi_left_aruco_sticker" />
+
+    <!-- <material name="umi_mirror" rgba="0 0 0 1" texrepeat="5 5" reflectance="1.0" /> -->
+    <material name="umi_white" rgba="1 1 1 1" />
+    <material name="umi_gray" rgba="0.15 0.15 0.15 1" />
+    <material name="umi_light_gray" rgba="0.6 0.6 0.6 1" />
+    <material name="umi_orange" rgba="0.92 0.68 0.24 1" />
+    <material name="umi_black" rgba="0 0 0 1" />
+  </asset>
+
+  <default>
+    <default class="umi_gripper">
+      <joint frictionloss="0.1" armature="0.1" />
+      <position kp="1000" />
+
+      <default class="screw">
+        <geom type="cylinder" size="0.0035 0.0035 0.01" material="umi_black" contype="0" conaffinity="0" />
+      </default>
+
+      <default class="gripper_slide">
+        <joint type="slide" damping="0.1" range="-1.2 1.2" />
+        <position kp="100" dampratio="1" ctrlrange="-1.2 1.2" />
+      </default>
+      <default class="gripper_hinge">
+        <joint type="hinge" damping="10.1" range="-31.415 31.415" />
+        <position kp="10" dampratio="0.1" ctrlrange="-3.1415 3.1415" />
+      </default>
+      <default class="finger_slide">
+        <joint type="slide" stiffness="100" damping="10.1" range="0 0.05" />
+      </default>
+
+      <default class="finger_actuator">
+        <position ctrlrange="0 0.05" />
+      </default>
+      <default class="gripper_actuator">
+        <position kp="10000" dampratio="1" ctrlrange="-1.2 1.2" />
+      </default>
+      <default class="gripper_rot_actuator">
+        <position kp="10000" dampratio="0.1" ctrlrange="-3.1415 3.1415" />
+      </default>
+
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" density="0" group="2" />
+      </default>
+      <default class="collision">
+        <geom type="mesh" group="3" />
+      </default>
+
+      <default class="marker">
+        <geom type="box" size="0.009 0.009 0.00001" material="umi_white" contype="0" conaffinity="0" mass="0.0" />
+      </default>
+      <default class="finger_holder_geom">
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" material="umi_white" />
+      </default>
+    </default>
+  </default>
+
+  <worldbody>
+    <body quat="-1 1 0 0" pos="0.3 0 1.2">
+
+      <!-- Gripper Camera -->
+      <!-- <camera name="gripper_gopro" pos="0 -0.092 0.04" quat="0 1 0 0" mode="fixed" fovy="155" /> -->
+
+      <!-- Positional Joints -->
+      <joint name="gripper_joint_x" axis="1 0 0" class="gripper_slide" />
+      <joint name="gripper_joint_y" axis="0 0 1" class="gripper_slide" />
+      <joint name="gripper_joint_z" axis="0 -1 0" class="gripper_slide" />
+
+      <!-- Rotational Joints -->
+      <joint name="gripper_joint_rx" axis="1 0 0" class="gripper_hinge" />
+      <joint name="gripper_joint_ry" axis="0 0 1" class="gripper_hinge" />
+      <joint name="gripper_joint_rz" axis="0 -1 0" class="gripper_hinge" />
+      <site name="gripper_base_site" pos="0 0 0" quat="0 0 0 1" size="0.005" rgba="0 1 0 1"/>
+      <!-- <site name="umi_ee" pos="0 0 0.185" quat="0 1 0 0" size="0.005" rgba="1 0 0 1"/> -->
+      <site name="umi_ee" pos="0 0 0.185" quat="0 1 0 0" size="0.005" rgba="0 0 0 0"/>
+
+
+      <!-- Linear Rail -->
+      <geom name="linear_guide_rail" type="box" pos="0 -0.002 0.062" size="0.08 0.003 0.004"
+            material="umi_light_gray" class="visual" />
+
+      <!-- Mirrors -->
+      <!-- <geom name="left_mirror" type="box" pos="-0.069 -0.057 0.04" size="0.03 0.0187 0.0001"
+            quat="0.828 0 0.5605 0" material="umi_mirror" class="visual" />
+      <geom name="right_mirror" type="box" pos="0.069 -0.057 0.04" size="0.03 0.0187 0.0001"
+            quat="0.828 0 -0.5605 0" material="umi_mirror" class="visual" /> -->
+
+      <!-- Base Link -->
+      <geom mesh="umi_base_link" class="visual" material="umi_white" />
+      <geom mesh="umi_base_link" class="collision" />
+      <!-- <geom mesh="umi_base_link" class="collision" contype="0" conaffinity="0"/> -->
+      <geom name="left_center_base_screw" pos="-0.076 -0.018 0.036" quat="-1 1 0 0" class="screw" />
+      <geom name="right_center_base_screw" pos="0.076 -0.018 0.036" quat="-1 1 0 0" class="screw" />
+      <geom name="left_back_base_screw" pos="-0.0137 -0.018 -0.018" quat="-1 1 0 0" class="screw" />
+      <geom name="right_back_base_screw" pos="0.0137 -0.018 -0.018" quat="-1 1 0 0" class="screw" />
+
+      <!-- GoPro Camera housing -->
+      <!-- <geom pos="0.01965 -0.07875 -0.0187" quat="0 0 -1 1" mesh="umi_gopro" class="visual" material="umi_gray" />
+      <geom pos="0.01965 -0.07875 -0.0187" quat="0 0 -1 1" mesh="umi_gopro" class="collision" /> -->
+
+      <!-- Left Finger -->
+      <body name="left_finger_holder" quat="1 1 0 0">
+        <geom name="left_screw_back_outside" pos="-0.0515 0.07 0.012" class="screw" />
+        <geom name="left_screw_back_inside" pos="-0.0615 0.07 0.012" class="screw" />
+        <geom name="left_screw_middle_outside" pos="-0.0768 0.0835 0.012" class="screw" />
+        <geom name="left_screw_middle_inside" pos="-0.047 0.0835 0.012" class="screw" />
+        <geom name="left_screw_front" pos="-0.0764 0.119 0.012" class="screw" />
+        <geom name="left_rail_block" type="box" pos="-0.051 0.063 0.006" size="0.009 0.012 0.004"
+              material="umi_gray" class="visual" />
+        <geom name="left_marker" pos="-0.062 0.088 0.0164" material="umi_Left_Aruco_Base_Sticker" class="marker" />
+        <inertial pos="-0.0613355 0.104073 -0.0013157" quat="0.49913 0.411547 -0.543302 0.53509"
+                  mass="0.080081" diaginertia="0.000104597 0.000102992 1.90532e-05" />
+        <joint name="left_finger_joint" axis="1 0 0" class="finger_slide" />
+        <geom mesh="umi_left_finger_holder" class="visual" material="umi_white" />
+        <geom mesh="umi_left_finger_holder" class="collision" />
+        <geom pos="-0.041722 0.0779 -0.0159" quat="0 0 -1 1" mesh="umi_left_finger" class="visual" material="umi_orange" />
+        <geom pos="-0.041722 0.0779 -0.0159" quat="0 0 -1 1" mesh="umi_left_finger" class="collision" />
+        <!-- <site name="umi_ee" pos="0 0.17 0" quat="0.70710678 0.70710678 0 0" size="0.005" rgba="1 0 0 1"/> -->
+      </body>
+
+      <!-- Right Finger -->
+      <body name="right_finger_holder" quat="1 1 0 0">
+        <geom name="right_screw_back_outside" pos="0.0515 0.07 0.012" class="screw" />
+        <geom name="right_screw_back_inside" pos="0.0615 0.07 0.012" class="screw" />
+        <geom name="right_screw_middle_outside" pos="0.0764 0.0835 0.012" class="screw" />
+        <geom name="right_screw_middle_inside" pos="0.047 0.0835 0.012" class="screw" />
+        <geom name="right_screw_front" pos="0.0764 0.119 0.012" class="screw" />
+        <geom name="right_rail_block" type="box" pos="0.051 0.063 0.006" size="0.009 0.012 0.004"
+              material="umi_gray" class="visual" />
+        <geom name="right_marker" pos="0.062 0.088 0.0164" material="umi_Right_Aruco_Base_Sticker" class="marker" />
+        <inertial pos="0.0613353 0.104073 -0.00131574" quat="0.535092 0.543308 -0.41154 0.499127"
+                  mass="0.080081" diaginertia="0.000104597 0.000102992 1.90532e-05" />
+        <joint name="right_finger_joint" axis="-1 0 0" class="finger_slide" />
+        <geom mesh="umi_right_finger_holder" class="visual" material="umi_white" />
+        <geom mesh="umi_right_finger_holder" class="collision" />
+        <geom pos="0.041722 0.0779 0.0099" quat="1 1 0 0" mesh="umi_right_finger" class="visual" material="umi_orange" />
+        <geom pos="0.041722 0.0779 0.0099" quat="1 1 0 0" mesh="umi_right_finger" class="collision" />
+      </body>
+
+    </body>
+  </worldbody>
+
+  <tendon>
+    <fixed name="split">
+      <joint joint="right_finger_joint" coef="0.5" />
+      <joint joint="left_finger_joint" coef="0.5" />
+    </fixed>
+  </tendon>
+
+  <actuator>
+    <position name="fingers_actuator" tendon="split" class="finger_actuator" />
+    <position name="gripper_joint_x_act" joint="gripper_joint_x" class="gripper_actuator" />
+    <position name="gripper_joint_y_act" joint="gripper_joint_y" class="gripper_actuator" />
+    <position name="gripper_joint_z_act" joint="gripper_joint_z" class="gripper_actuator" />
+    <position name="gripper_joint_rx_act" joint="gripper_joint_rx" class="gripper_rot_actuator" />
+    <position name="gripper_joint_ry_act" joint="gripper_joint_ry" class="gripper_rot_actuator" />
+    <position name="gripper_joint_rz_act" joint="gripper_joint_rz" class="gripper_rot_actuator" />
+  </actuator>
+</mujoco>
+
+

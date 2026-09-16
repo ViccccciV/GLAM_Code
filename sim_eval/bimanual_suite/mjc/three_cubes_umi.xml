@@ -1,0 +1,270 @@
+<mujoco model="frank_scene">
+  <compiler angle="radian" meshdir="assets" texturedir="assets"/>
+  <option timestep="0.002" integrator="implicitfast" gravity="0 0 -9.81" impratio="10" cone="elliptic" noslip_iterations="2">
+    <flag warmstart="disable" multiccd="enable"/>
+  </option>
+
+  <visual>
+    <global offwidth="1920" offheight="1080"/>
+    <quality shadowsize="4096"/>
+    <map shadowclip="0.5" fogstart="10" fogend="15"/>
+  </visual>
+
+  <asset>
+    <texture name="groundplane" type="2d" builtin="checker" mark="edge"
+             rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+             markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane" texture="groundplane"
+              texrepeat="5 5" texuniform="true" reflectance="0.2"/>
+    <material name="orange" rgba="1 0.5 0 1"/>
+    <material name="black"  rgba="0 0 0 1"/>
+    <material name="blue"   rgba="0 0.5 1 1"/>
+    <material name="purple" rgba="0.6 0.2 0.8 1"/>
+
+    <!-- UMI gripper meshes (shared by both grippers) -->
+    <mesh name="umi_base_link"           file="umi_gripper/meshes/new_base.stl"/>
+    <mesh name="umi_left_finger_holder"  file="umi_gripper/meshes/left_finger_holder.stl"/>
+    <mesh name="umi_left_finger"         file="umi_gripper/meshes/left_finger.stl"/>
+    <mesh name="umi_right_finger_holder" file="umi_gripper/meshes/right_finger_holder.stl"/>
+    <mesh name="umi_right_finger"        file="umi_gripper/meshes/right_finger.stl"/>
+
+    <texture name="umi_right_aruco_sticker" type="2d" file="umi_gripper/meshes/right_aruco_sticker.png"/>
+    <texture name="umi_left_aruco_sticker"  type="2d" file="umi_gripper/meshes/left_aruco_sticker.png"/>
+    <material name="umi_Right_Aruco_Base_Sticker" texture="umi_right_aruco_sticker"/>
+    <material name="umi_Left_Aruco_Base_Sticker"  texture="umi_left_aruco_sticker"/>
+    <material name="umi_white"      rgba="1 1 1 1"/>
+    <material name="umi_gray"       rgba="0.15 0.15 0.15 1"/>
+    <material name="umi_light_gray" rgba="0.6 0.6 0.6 1"/>
+    <material name="umi_orange"     rgba="0.92 0.68 0.24 1"/>
+    <material name="umi_black"      rgba="0 0 0 1"/>
+  </asset>
+
+  <default>
+    <default class="cube">
+      <geom type="box" size="0.0275 0.0275 0.0275"
+            mass="0.01" friction="1.0 1.0 1.0" condim="4" solimp="0.95 0.99 0.001" solref="0.004 1"/>
+    </default>
+
+    <default class="umi_gripper">
+      <joint frictionloss="0.1" armature="0.1"/>
+      <position kp="1000"/>
+      <default class="screw">
+        <geom type="cylinder" size="0.0035 0.0035 0.01" material="umi_black" contype="0" conaffinity="0"/>
+      </default>
+      <default class="gripper_slide">
+        <joint type="slide" damping="0.1" range="-1.2 1.2"/>
+        <position kp="100" dampratio="1" ctrlrange="-1.2 1.2"/>
+      </default>
+      <default class="gripper_hinge">
+        <joint type="hinge" damping="10.1" range="-31.415 31.415"/>
+        <position kp="10" dampratio="0.1" ctrlrange="-3.1415 3.1415"/>
+      </default>
+      <default class="finger_slide">
+        <joint type="slide" stiffness="100" damping="10.1" range="0 0.05"/>
+      </default>
+      <default class="finger_actuator">
+        <position ctrlrange="0 0.05"/>
+      </default>
+      <default class="gripper_actuator">
+        <position kp="10000" dampratio="1" ctrlrange="-1.2 1.2"/>
+      </default>
+      <default class="gripper_rot_actuator">
+        <position kp="10000" dampratio="0.1" ctrlrange="-3.1415 3.1415"/>
+      </default>
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" density="0" group="2"/>
+      </default>
+      <default class="collision">
+        <geom type="mesh" group="3"/>
+      </default>
+      <default class="marker">
+        <geom type="box" size="0.009 0.009 0.00001" material="umi_white" contype="0" conaffinity="0" mass="0.0"/>
+      </default>
+      <default class="finger_holder_geom">
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" material="umi_white"/>
+      </default>
+    </default>
+  </default>
+
+  <worldbody>
+    <light pos="0 0 3" dir="0 0 -1" directional="true" castshadow="false"/>
+    <light pos="2 2 3" dir="-1 -1 -1" directional="false" castshadow="false"/>
+    <camera name="back" pos="-0.400 -0.009 2.089" xyaxes="0.006 -1.000 -0.000 0.900 0.006 0.436"/>
+    <camera name="front" pos="1.220 0.033 2.009" xyaxes="-0.002 1.000 -0.000 -0.696 -0.001 0.718"/>
+    <geom name="floor" type="plane" size="0 0 0.05" material="groundplane"/>
+
+    <body name="blue_cube" pos="0.4 -0.13 0.79" quat="0.9238795 0 0 0.3826834">
+      <freejoint/>
+      <site name="blue_cube" pos="0.0 0.0 0.0" quat="0. 0. 0. 1." rgba="0 0 0 1.0"/>
+      <geom name="blue_cube_geom" class="cube" material="blue"/>
+    </body>
+
+    <body name="orange_cube" pos="0.5 0.0 0.79">
+      <freejoint/>
+      <site name="orange_cube" pos="0.0 0.0 0.0" quat="0. 0. 0. 1." rgba="0 0 0 0"/>
+      <geom name="orange_cube_geom" class="cube" material="orange"/>
+    </body>
+
+    <body name="purple_cube" pos="0.4 0.13 0.79" quat="0.9238795 0 0 0.3826834">
+      <freejoint/>
+      <site name="purple_cube" pos="0.0 0.0 0.0" quat="0. 0. 0. 1." rgba="0 0 0 1.0"/>
+      <geom name="purple_cube_geom" class="cube" material="purple"/>
+    </body>
+
+    <!-- ============================================================ -->
+    <!-- RIGHT UMI gripper. Body pos/quat are placeholders; runtime   -->
+    <!-- writes model.body_pos / model.body_quat at episode start so  -->
+    <!-- the right_umi_ee site lands at the right frank EE pose.      -->
+    <!-- This mirrors `randomize_umi_pose` in single-UMI tasks.       -->
+    <!-- ============================================================ -->
+    <body name="right_gripper_root" pos="0.3 -0.15 1.2" quat="-1 1 0 0" childclass="umi_gripper">
+      <joint name="right_gripper_joint_x"  axis="1 0 0"  class="gripper_slide"/>
+      <joint name="right_gripper_joint_y"  axis="0 0 1"  class="gripper_slide"/>
+      <joint name="right_gripper_joint_z"  axis="0 -1 0" class="gripper_slide"/>
+      <joint name="right_gripper_joint_rx" axis="1 0 0"  class="gripper_hinge"/>
+      <joint name="right_gripper_joint_ry" axis="0 0 1"  class="gripper_hinge"/>
+      <joint name="right_gripper_joint_rz" axis="0 -1 0" class="gripper_hinge"/>
+      <site name="right_gripper_base_site" pos="0 0 0" quat="0 0 0 1" size="0.005" rgba="0 1 0 1"/>
+      <site name="right_umi_ee" pos="0 0 0.185" quat="0 1 0 0" size="0.005" rgba="0 0 0 0"/>
+
+      <geom name="right_linear_guide_rail" type="box" pos="0 -0.002 0.062" size="0.08 0.003 0.004"
+            material="umi_light_gray" class="visual"/>
+      <geom name="right_umi_base_visual"    mesh="umi_base_link" class="visual" material="umi_white"/>
+      <geom name="right_umi_base_collision" mesh="umi_base_link" class="collision"/>
+      <geom name="right_lc_base_screw" pos="-0.076 -0.018 0.036"  quat="-1 1 0 0" class="screw"/>
+      <geom name="right_rc_base_screw" pos=" 0.076 -0.018 0.036"  quat="-1 1 0 0" class="screw"/>
+      <geom name="right_lb_base_screw" pos="-0.0137 -0.018 -0.018" quat="-1 1 0 0" class="screw"/>
+      <geom name="right_rb_base_screw" pos=" 0.0137 -0.018 -0.018" quat="-1 1 0 0" class="screw"/>
+
+      <body name="right_left_finger_holder" quat="1 1 0 0">
+        <geom name="right_lfh_screw_back_outside"   pos="-0.0515 0.07   0.012" class="screw"/>
+        <geom name="right_lfh_screw_back_inside"    pos="-0.0615 0.07   0.012" class="screw"/>
+        <geom name="right_lfh_screw_middle_outside" pos="-0.0768 0.0835 0.012" class="screw"/>
+        <geom name="right_lfh_screw_middle_inside"  pos="-0.047  0.0835 0.012" class="screw"/>
+        <geom name="right_lfh_screw_front"          pos="-0.0764 0.119  0.012" class="screw"/>
+        <geom name="right_lfh_rail_block" type="box" pos="-0.051 0.063 0.006" size="0.009 0.012 0.004"
+              material="umi_gray" class="visual"/>
+        <geom name="right_lfh_marker" pos="-0.062 0.088 0.0164" material="umi_Left_Aruco_Base_Sticker" class="marker"/>
+        <inertial pos="-0.0613355 0.104073 -0.0013157" quat="0.49913 0.411547 -0.543302 0.53509"
+                  mass="0.080081" diaginertia="0.000104597 0.000102992 1.90532e-05"/>
+        <joint name="right_left_finger_joint" axis="1 0 0" class="finger_slide"/>
+        <geom name="right_lfh_visual"            mesh="umi_left_finger_holder" class="visual"    material="umi_white"/>
+        <geom name="right_lfh_collision"         mesh="umi_left_finger_holder" class="collision"/>
+        <geom name="right_left_finger_visual"    pos="-0.041722 0.0779 -0.0159" quat="0 0 -1 1" mesh="umi_left_finger" class="visual" material="umi_orange"/>
+        <geom name="right_left_finger_collision" pos="-0.041722 0.0779 -0.0159" quat="0 0 -1 1" mesh="umi_left_finger" class="collision"/>
+      </body>
+
+      <body name="right_right_finger_holder" quat="1 1 0 0">
+        <geom name="right_rfh_screw_back_outside"   pos="0.0515 0.07   0.012" class="screw"/>
+        <geom name="right_rfh_screw_back_inside"    pos="0.0615 0.07   0.012" class="screw"/>
+        <geom name="right_rfh_screw_middle_outside" pos="0.0764 0.0835 0.012" class="screw"/>
+        <geom name="right_rfh_screw_middle_inside"  pos="0.047  0.0835 0.012" class="screw"/>
+        <geom name="right_rfh_screw_front"          pos="0.0764 0.119  0.012" class="screw"/>
+        <geom name="right_rfh_rail_block" type="box" pos="0.051 0.063 0.006" size="0.009 0.012 0.004"
+              material="umi_gray" class="visual"/>
+        <geom name="right_rfh_marker" pos="0.062 0.088 0.0164" material="umi_Right_Aruco_Base_Sticker" class="marker"/>
+        <inertial pos="0.0613353 0.104073 -0.00131574" quat="0.535092 0.543308 -0.41154 0.499127"
+                  mass="0.080081" diaginertia="0.000104597 0.000102992 1.90532e-05"/>
+        <joint name="right_right_finger_joint" axis="-1 0 0" class="finger_slide"/>
+        <geom name="right_rfh_visual"             mesh="umi_right_finger_holder" class="visual"    material="umi_white"/>
+        <geom name="right_rfh_collision"          mesh="umi_right_finger_holder" class="collision"/>
+        <geom name="right_right_finger_visual"    pos="0.041722 0.0779 0.0099" quat="1 1 0 0" mesh="umi_right_finger" class="visual" material="umi_orange"/>
+        <geom name="right_right_finger_collision" pos="0.041722 0.0779 0.0099" quat="1 1 0 0" mesh="umi_right_finger" class="collision"/>
+      </body>
+    </body>
+
+    <!-- ============================================================ -->
+    <!-- LEFT UMI gripper. Same placeholder pose pattern as right.   -->
+    <!-- ============================================================ -->
+    <body name="left_gripper_root" pos="0.3 0.15 1.2" quat="-1 1 0 0" childclass="umi_gripper">
+      <joint name="left_gripper_joint_x"  axis="1 0 0"  class="gripper_slide"/>
+      <joint name="left_gripper_joint_y"  axis="0 0 1"  class="gripper_slide"/>
+      <joint name="left_gripper_joint_z"  axis="0 -1 0" class="gripper_slide"/>
+      <joint name="left_gripper_joint_rx" axis="1 0 0"  class="gripper_hinge"/>
+      <joint name="left_gripper_joint_ry" axis="0 0 1"  class="gripper_hinge"/>
+      <joint name="left_gripper_joint_rz" axis="0 -1 0" class="gripper_hinge"/>
+      <site name="left_gripper_base_site" pos="0 0 0" quat="0 0 0 1" size="0.005" rgba="0 1 0 1"/>
+      <site name="left_umi_ee" pos="0 0 0.185" quat="0 1 0 0" size="0.005" rgba="0 0 0 0"/>
+
+      <geom name="left_linear_guide_rail" type="box" pos="0 -0.002 0.062" size="0.08 0.003 0.004"
+            material="umi_light_gray" class="visual"/>
+      <geom name="left_umi_base_visual"    mesh="umi_base_link" class="visual" material="umi_white"/>
+      <geom name="left_umi_base_collision" mesh="umi_base_link" class="collision"/>
+      <geom name="left_lc_base_screw" pos="-0.076 -0.018 0.036"  quat="-1 1 0 0" class="screw"/>
+      <geom name="left_rc_base_screw" pos=" 0.076 -0.018 0.036"  quat="-1 1 0 0" class="screw"/>
+      <geom name="left_lb_base_screw" pos="-0.0137 -0.018 -0.018" quat="-1 1 0 0" class="screw"/>
+      <geom name="left_rb_base_screw" pos=" 0.0137 -0.018 -0.018" quat="-1 1 0 0" class="screw"/>
+
+      <body name="left_left_finger_holder" quat="1 1 0 0">
+        <geom name="left_lfh_screw_back_outside"   pos="-0.0515 0.07   0.012" class="screw"/>
+        <geom name="left_lfh_screw_back_inside"    pos="-0.0615 0.07   0.012" class="screw"/>
+        <geom name="left_lfh_screw_middle_outside" pos="-0.0768 0.0835 0.012" class="screw"/>
+        <geom name="left_lfh_screw_middle_inside"  pos="-0.047  0.0835 0.012" class="screw"/>
+        <geom name="left_lfh_screw_front"          pos="-0.0764 0.119  0.012" class="screw"/>
+        <geom name="left_lfh_rail_block" type="box" pos="-0.051 0.063 0.006" size="0.009 0.012 0.004"
+              material="umi_gray" class="visual"/>
+        <geom name="left_lfh_marker" pos="-0.062 0.088 0.0164" material="umi_Left_Aruco_Base_Sticker" class="marker"/>
+        <inertial pos="-0.0613355 0.104073 -0.0013157" quat="0.49913 0.411547 -0.543302 0.53509"
+                  mass="0.080081" diaginertia="0.000104597 0.000102992 1.90532e-05"/>
+        <joint name="left_left_finger_joint" axis="1 0 0" class="finger_slide"/>
+        <geom name="left_lfh_visual"            mesh="umi_left_finger_holder" class="visual"    material="umi_white"/>
+        <geom name="left_lfh_collision"         mesh="umi_left_finger_holder" class="collision"/>
+        <geom name="left_left_finger_visual"    pos="-0.041722 0.0779 -0.0159" quat="0 0 -1 1" mesh="umi_left_finger" class="visual" material="umi_orange"/>
+        <geom name="left_left_finger_collision" pos="-0.041722 0.0779 -0.0159" quat="0 0 -1 1" mesh="umi_left_finger" class="collision"/>
+      </body>
+
+      <body name="left_right_finger_holder" quat="1 1 0 0">
+        <geom name="left_rfh_screw_back_outside"   pos="0.0515 0.07   0.012" class="screw"/>
+        <geom name="left_rfh_screw_back_inside"    pos="0.0615 0.07   0.012" class="screw"/>
+        <geom name="left_rfh_screw_middle_outside" pos="0.0764 0.0835 0.012" class="screw"/>
+        <geom name="left_rfh_screw_middle_inside"  pos="0.047  0.0835 0.012" class="screw"/>
+        <geom name="left_rfh_screw_front"          pos="0.0764 0.119  0.012" class="screw"/>
+        <geom name="left_rfh_rail_block" type="box" pos="0.051 0.063 0.006" size="0.009 0.012 0.004"
+              material="umi_gray" class="visual"/>
+        <geom name="left_rfh_marker" pos="0.062 0.088 0.0164" material="umi_Right_Aruco_Base_Sticker" class="marker"/>
+        <inertial pos="0.0613353 0.104073 -0.00131574" quat="0.535092 0.543308 -0.41154 0.499127"
+                  mass="0.080081" diaginertia="0.000104597 0.000102992 1.90532e-05"/>
+        <joint name="left_right_finger_joint" axis="-1 0 0" class="finger_slide"/>
+        <geom name="left_rfh_visual"             mesh="umi_right_finger_holder" class="visual"    material="umi_white"/>
+        <geom name="left_rfh_collision"          mesh="umi_right_finger_holder" class="collision"/>
+        <geom name="left_right_finger_visual"    pos="0.041722 0.0779 0.0099" quat="1 1 0 0" mesh="umi_right_finger" class="visual" material="umi_orange"/>
+        <geom name="left_right_finger_collision" pos="0.041722 0.0779 0.0099" quat="1 1 0 0" mesh="umi_right_finger" class="collision"/>
+      </body>
+    </body>
+
+  </worldbody>
+
+  <tendon>
+    <fixed name="right_split">
+      <joint joint="right_right_finger_joint" coef="0.5"/>
+      <joint joint="right_left_finger_joint"  coef="0.5"/>
+    </fixed>
+    <fixed name="left_split">
+      <joint joint="left_right_finger_joint"  coef="0.5"/>
+      <joint joint="left_left_finger_joint"   coef="0.5"/>
+    </fixed>
+  </tendon>
+
+  <actuator>
+    <!-- RIGHT gripper -->
+    <position name="right_fingers_actuator"      tendon="right_split"               class="finger_actuator"/>
+    <position name="right_gripper_joint_x_act"   joint="right_gripper_joint_x"      class="gripper_actuator"/>
+    <position name="right_gripper_joint_y_act"   joint="right_gripper_joint_y"      class="gripper_actuator"/>
+    <position name="right_gripper_joint_z_act"   joint="right_gripper_joint_z"      class="gripper_actuator"/>
+    <position name="right_gripper_joint_rx_act"  joint="right_gripper_joint_rx"     class="gripper_rot_actuator"/>
+    <position name="right_gripper_joint_ry_act"  joint="right_gripper_joint_ry"     class="gripper_rot_actuator"/>
+    <position name="right_gripper_joint_rz_act"  joint="right_gripper_joint_rz"     class="gripper_rot_actuator"/>
+    <!-- LEFT gripper -->
+    <position name="left_fingers_actuator"       tendon="left_split"                class="finger_actuator"/>
+    <position name="left_gripper_joint_x_act"    joint="left_gripper_joint_x"       class="gripper_actuator"/>
+    <position name="left_gripper_joint_y_act"    joint="left_gripper_joint_y"       class="gripper_actuator"/>
+    <position name="left_gripper_joint_z_act"    joint="left_gripper_joint_z"       class="gripper_actuator"/>
+    <position name="left_gripper_joint_rx_act"   joint="left_gripper_joint_rx"      class="gripper_rot_actuator"/>
+    <position name="left_gripper_joint_ry_act"   joint="left_gripper_joint_ry"      class="gripper_rot_actuator"/>
+    <position name="left_gripper_joint_rz_act"   joint="left_gripper_joint_rz"      class="gripper_rot_actuator"/>
+  </actuator>
+
+  <!-- frank.xml provides the table mesh, overhead_cam, and the frank robot,
+       same as in the other UMI task xmls (e.g. two_cube_umi.xml). -->
+  <include file="frank.xml"/>
+</mujoco>
